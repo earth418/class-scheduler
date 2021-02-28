@@ -1,27 +1,17 @@
-# import time, pythoncom, win32api
-# import win32com #.taskscheduler import taskscheduler
-
-# task_name = 'Class_Scheduler'
-
-# scheduler = win32com.client.Dispatch('Schedule.Service')
-# scheduler.Connect()
-
-# root_folder = scheduler.GetFolder('\\')
-# task_def = scheduler.NewTask(0)
-
-# # Create the Trigger
-
 import os
+from join_class import *
+from schedule import Schedule
 
-task_name = ''
+def create_task(schedule : Schedule):
+    task_name = "Class Scheduler Task"
+    
+    f = open("current_schedule.sch", "w+")
+    f.write(str(schedule))
+    current_dir = os.getcwd()
 
-current_dir = os.getcwd()
+    # Calls Microsoft's Task Creation; task name     schedule   what days it'll run       What task it'll run         Start/end times 
+    os.system(rf'SchTasks /Create  /TN "{task_name}" /SC DAILY /D MON, TUE, WED, THU, FRI /TR "py {current_dir}/task_scheduler.py" /ST 08:30 /ET 14:00').read()
+    
+if __name__ == "__main__":
 
-os.system(rf'''SchTasks /Create 
-    /TN "{task_name}"               # Task name
-    /SC DAILY                       # Run every day
-    /D MON, TUE, WED, THU, FRI      # only on days Mon-Fri
-    /TR "{current_dir}/run.bat"     # Program will compile into an .exe; replace with that.
-    /ST 08:30                       # Start at 8:30 am
-    /ET 14:00                       # End at 2:00 pm
-    ''').read()
+    sch = Schedule.open("current_schedule.sch")

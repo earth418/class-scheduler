@@ -1,11 +1,14 @@
 import sys
-from .class_info import *
+from class_info import *
 import webbrowser as wb 
 import keyboard
 
 
 
 def join_zoom_class(in_class : ZoomClass):
+    pass
+
+def leave_zoom_class():
     pass
 
 def join_google_meet(in_class : MeetClass):
