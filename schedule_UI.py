@@ -3,24 +3,26 @@ from tkinter import messagebox, filedialog
 from schedule import Schedule
 from class_info import *
 from task_scheduler import create_task
+from schedule_item_editor import create_editor
 
 class App:
 
     def __init__(self, master : Tk) -> None:
         self.schedule = Schedule()
         self.master = master
+        self.schedule_grid = {"monday" : {}, "tuesday" : {}, "wednesday" : {}, "thursday" : {}, "friday" : {}}
 
         self.BOX_SIZE = 100
 
         class_list = self.schedule.get_list()
 
         for day in class_list:
-            for i in range(8):
+            for i in range(5):
                 day.append(Class(f'Class {i + 1}'))
 
         self.init_display()
 
-        self.display_schedule()
+        self.init_schedule()
 
     def update(self):
 
@@ -58,31 +60,34 @@ class App:
         days_frame = Frame(self.master)
         days_frame.pack(side=TOP)
 
-
         # Creating the Reset, Save, and Setup Task buttons
         menu_frame = Frame(self.master)
         menu_frame.pack(side=TOP)
+        
         reset = Button(menu_frame, text='Reset Schedule', command=self.reset)
         reset.pack(side=LEFT)
+        
         save = Button(menu_frame, text='Save to File', command=self.save)
         save.pack(side=RIGHT)
+
         save = Button(menu_frame, text='Setup Task', command=self.setup_task)
         save.pack(side=RIGHT)
 
+        open_button = Button(menu_frame, text='Open from File', command=self.open_file)
+        open_button.pack()
+
         # Creating the canvas
-        self.canvas = Canvas(self.master, width = 500, height = 1000)
+        self.canvas = Canvas(self.master, width = 500, height = 700)
 
         # Binding Mouse Events
         self.canvas.bind('<ButtonPress-1>', self.pickup)
-        self.canvas.bind("<B1-Motion>", self.draw)
+        self.canvas.bind("<B1-Motion>", self.move_item)
         self.canvas.bind("<ButtonRelease-1>", self.release)
         self.canvas.bind("<Double-Button-1>", self.select)
 
         # Packing and setting focus, so the mouse will always work.
         self.canvas.pack()
         self.canvas.focus_set()
-
-
 
         # Creating the labels for each day
         for index, day in enumerate(Schedule.DAYS):
@@ -95,7 +100,7 @@ class App:
         will_reset = messagebox.askyesno("Reset", "Are you sure you want to reset your board?")
         if will_reset:
             self.schedule.clear()
-            self.display_schedule()
+            self.init_schedule()
 
     # Saves the schedule to a file    
     def save(self):
@@ -115,14 +120,31 @@ class App:
         print(self.canvas.find_closest(event.x, event.y))
         pass
 
+ 
+    def open_file(self):
+        filename = filedialog.askopenfilename(defaultextension='.sch')
+        self.schedule = Schedule.open(filename)
+
+        # When the box is starting to be drug by the mouse, for movement.
+    
     # When the box is starting to be drug by the mouse, for movement.
     def pickup(self, event):
-        pass
-    
-    # 
-    def draw(self, event):
+        item_index = self.canvas.find_closest(event.x, event.y)
+        # ind = self.schedule_grid.index(
+        if (item_index, item_index + 1) in self.schedule_grid:
+            self.selected_box = (item_index, item_index + 1)
+        elif (item_index, item_index - 1) in self.schedule_grid:
+            self.selected_box = (item_index, item_index - 1)
+        
+        print(self.selected_box)
+        self.canvas.move()
         pass
 
+    # While the box is being drug
+    def move_item(self, event):
+        pass
+
+    # When the box is released
     def release(self, event):
         pass
 
@@ -132,7 +154,7 @@ class App:
 
     #     a, b = self.create_box(self.canvas, box_loc, t_text=_class.name)
 
-    def display_schedule(self):
+    def init_schedule(self):
 
         class_list = self.schedule.get_list()
 
@@ -142,14 +164,14 @@ class App:
                             day_index * self.BOX_SIZE + self.BOX_SIZE, class_index * self.BOX_SIZE + 2 * self.BOX_SIZE)
                     
                 a, b = self.create_box(self.canvas, box_loc, t_text=_class.name)
-                
+                self.schedule_grid[day][str(_class)] = (a, b)
 
 
 root = Tk()
 app = App(root)
 
 root.title("Schedule Maker")
-root.geometry("500x900")
+root.geometry("500x800")
 
 while True:
     app.update()

@@ -1,4 +1,6 @@
-# import time
+import keyboard, sys
+from time import sleep
+import webbrowser as wb
 
 class Time:
 
@@ -26,7 +28,6 @@ class Time:
         # print(rf'"{string}"')
         return Time(int(string[0:2]), int(string[3:5]))
 
-
 class Class:
 
     def __init__(self, name, start=Time(0, 0), end=Time(0, 0)) -> None:
@@ -34,7 +35,9 @@ class Class:
 
         # if start is not None:
         self.start = start
-        self.end = end #Time(0, 0)
+        self.end = end
+
+        self.is_in_class = False
     
     '''
     Returns each class's name, and start time to end time in the format:
@@ -47,15 +50,59 @@ class Class:
 
     def get_length(self) -> Time:
         return self.end - self.start
-    
-    # def __repr__(self) -> str:
-    #     return f'{self.name}, {self.start} - {self.end}'
 
 class ZoomClass(Class):
 
-    zoom_id : str
-    zoom_pwd : str
+    def __init__(self, name, start, end) -> None:
+        
+        super().__init__(name, start=start, end=end)
+
+        self.zoom_id : str = ''
+        self.zoom_pwd : str = ''
+
+    def join_zoom_class(self):
+        if self.is_in_class:
+            raise "Error; already in class!"
+        else:
+            pass
+
+    def leave_zoom_class(self):
+        if self.is_in_class:
+            pass
+        else:
+            raise "Not in a class!"
+
 
 class MeetClass(Class):
 
-    google_meet_link : str
+    CHROME_DIR : str = ''
+    path = str(sys.path).split(';')
+    
+    for path_item in path:
+        
+        if "chrome" in path_item.lower():
+            chrome_dir = path_item
+            break
+
+    def __init__(self, name, start, end) -> None:
+        
+        super().__init__(name, start=start, end=end)
+        self.google_meet_link : str = ''
+
+    def join_google_meet(self):
+
+        chrome_dir = ''
+        path = str(sys.path).split(';')
+        for path_item in path:
+            if "chrome" in path.lower():
+                chrome_dir = path_item
+                break
+
+        wb.BackgroundBrowser(chrome_dir).open_new_tab(self.google_meet_link)
+
+def leave_google_meet(self):
+    if self.is_in_class:
+        keyboard.send("CTRL+W")
+        pass
+    else:
+        raise "Not in a class!"
