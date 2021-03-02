@@ -26,7 +26,7 @@ class Schedule:
     Clears the schedule of its classes.
     '''
     def clear(self):
-        [getattr(self, day).clear() for day in self.DAYS]
+        [setattr(self, day, []) for day in self.DAYS]
 
     '''
     Returns the schedule as a string, with each class separated by lines.
@@ -46,9 +46,8 @@ class Schedule:
     @staticmethod
     def open(filepath):
         ret = Schedule()
-        d = open(filepath, 'r').readlines()
-
-        # print(d[1::2])
+        with open(filepath, 'r') as fil:
+            d = fil.readlines()
 
         for day_index, classes in enumerate(d[1::2]):
 

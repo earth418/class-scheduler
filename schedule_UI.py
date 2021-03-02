@@ -90,10 +90,12 @@ class App:
         self.canvas.focus_set()
 
         # Creating the labels for each day
-        for index, day in enumerate(Schedule.DAYS):
-            day = day[0].upper() + day[1:]
-            box_loc = (index * self.BOX_SIZE, 0, index * self.BOX_SIZE + self.BOX_SIZE, self.BOX_SIZE)
-            a, b = self.create_box(self.canvas, box_loc, t_text=day, t_font = ("",13))
+        # days_frame
+        for day in Schedule.DAYS:
+            Label(days_frame, text=day, bd=1)
+            # day = day[0].upper() + day[1:]
+            # box_loc = (index * self.BOX_SIZE, 0, index * self.BOX_SIZE + self.BOX_SIZE, self.BOX_SIZE)
+            # a, b = self.create_box(self.canvas, box_loc, t_text=day, t_font = ("",13))
 
     # Empties the schedule
     def reset(self):
@@ -117,7 +119,16 @@ class App:
 
     # Select a box, for modification.
     def select(self, event : Event):
-        print(self.canvas.find_closest(event.x, event.y))
+        a = self.canvas.find_closest(event.x, event.y)
+        print(a)
+        selected_class = Class()
+
+        for day_classes in self.schedule_grid.items():
+            print(day_classes)
+            if a in day_classes:
+                selected_class = day_classes[a]
+                break
+        create_editor(selected_class)
         pass
 
  
@@ -164,7 +175,8 @@ class App:
                             day_index * self.BOX_SIZE + self.BOX_SIZE, class_index * self.BOX_SIZE + 2 * self.BOX_SIZE)
                     
                 a, b = self.create_box(self.canvas, box_loc, t_text=_class.name)
-                self.schedule_grid[day][str(_class)] = (a, b)
+                self.schedule_grid[Schedule.DAYS[day_index]][a, b] = _class
+                # self.schedule_grid[Schedule.DAYS[day_index]][b] = _class
 
 
 root = Tk()

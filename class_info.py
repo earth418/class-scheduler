@@ -1,10 +1,11 @@
-import keyboard, sys
-from time import sleep
-import webbrowser as wb
+import os, sys, time, mouse
+import keyboard as kb
+import cv2
+from screeninfo import get_monitors
 
 class Time:
 
-    def __init__(self, hr, min) -> None:
+    def __init__(self, hr=0, min=0) -> None:
         self.minute : int = min
         self.hour : int = hr
 
@@ -19,9 +20,18 @@ class Time:
             return Time(self.hour * other.hour, self.minute * other.minute)
         else:
             return Time(self.hour * other, self.minute * other)
+        
+    def to_minutes(self):
+        return self.hour * 60 + self.minute
 
     def __sub__(self, other):
         return self + (other * -1)
+
+    def __lt__(self, other):
+        return (self - other).to_minutes() > 0
+
+    def __gt__(self, other):
+        return (self - other).to_minutes() < 0
 
     @staticmethod
     def from_str(string):
@@ -30,7 +40,7 @@ class Time:
 
 class Class:
 
-    def __init__(self, name, start=Time(0, 0), end=Time(0, 0)) -> None:
+    def __init__(self, name=None, start=Time(0, 0), end=Time(0, 0)) -> None:
         self.name = name
 
         # if start is not None:
@@ -76,13 +86,6 @@ class ZoomClass(Class):
 class MeetClass(Class):
 
     CHROME_DIR : str = ''
-    path = str(sys.path).split(';')
-    
-    for path_item in path:
-        
-        if "chrome" in path_item.lower():
-            chrome_dir = path_item
-            break
 
     def __init__(self, name, start, end) -> None:
         
@@ -91,18 +94,21 @@ class MeetClass(Class):
 
     def join_google_meet(self):
 
-        chrome_dir = ''
-        path = str(sys.path).split(';')
-        for path_item in path:
-            if "chrome" in path.lower():
-                chrome_dir = path_item
-                break
+        os.system("start chrome")
+        time.sleep(1.0)
+        kb.write(self.google_meet_link)
+        kb.send("ENTER")
 
-        wb.BackgroundBrowser(chrome_dir).open_new_tab(self.google_meet_link)
+        monitor_size = get_monitors()[0]
+        joinloc = (0.65 * monitor_size[0], 0.55 * monitor_size[1])
+
+        time.sleep(2.0)
+        mouse.move(*joinloc)
+        mouse.click()
 
 def leave_google_meet(self):
     if self.is_in_class:
-        keyboard.send("CTRL+W")
+        kb.send("CTRL+W")
         pass
     else:
         raise "Not in a class!"
