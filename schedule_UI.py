@@ -120,11 +120,9 @@ class App:
     # Select a box, for modification.
     def select(self, event : Event):
         a = self.canvas.find_closest(event.x, event.y)
-        print(a)
         selected_class = Class()
 
         for day_classes in self.schedule_grid.items():
-            print(day_classes)
             if a in day_classes:
                 selected_class = day_classes[a]
                 break
@@ -147,7 +145,6 @@ class App:
         elif (item_index, item_index - 1) in self.schedule_grid:
             self.selected_box = (item_index, item_index - 1)
         
-        print(self.selected_box)
         self.canvas.move()
         pass
 
